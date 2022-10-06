@@ -1,8 +1,9 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
+const bcrypt = require('bcrypt');
 
 //create our user model
-class User extends Model {}
+class User extends Model { }
 
 //define table coloumns and configuration
 User.init(
@@ -12,13 +13,13 @@ User.init(
             //use the special Sequelize DataTypes object provide what type of data it is
             type: DataTypes.INTEGER,
             //this is the equivalent of SQL's `NOT NULL` option
-            allowNull: false, 
+            allowNull: false,
             //instruct that this is the Primary Key
             primaryKey: true,
             //turn on auto increment
             autoIncrement: true,
         },
-        
+
         //define a username column
         username: {
             type: DataTypes.STRING,
@@ -37,23 +38,35 @@ User.init(
         },
         //define a password column
         password: {
-            type: DataTypes.STRING, 
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 //this means the password must be at least four characters long
                 len: [4]
-                }
+            }
+        }
+    },
+    {
+        hooks: {
+            //set up beforeCreate lifecycle 'hook' functionality
+            async beforeCreate(newUserData) {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                return newUserData
+            },
+            //set up beforeUpdate lifecycle 'hook' functionality
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                return updatedUserData;
             }
         },
-        {
-            sequelize,
-            timestamps: false,
-            freezeTableName: true,
-            underscored: true,
-            mondelName: 'user'
-        }
+        sequelize,
+        timestamps: false,
+        freezeTableName: true,
+        underscored: true,
+        mondelName: 'user'
+    }
 
-    );
-        
+);
+
 
 module.exports = User;
