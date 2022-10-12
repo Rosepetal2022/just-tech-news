@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
         user_id: req.body.user_id, 
         post_id: req.body.post_id
     })
-    .then(dbCommentData = res.json(dbCommentData))
+    .then(dbCommentData => res.json(dbCommentData))
     .catch(err => {
         console.log(err);
         res.status(400).json(err);
@@ -31,8 +31,8 @@ router.delete('/:id', (req, res) => {
         }
     })
     .then(dbCommentData => {
-        if(!dbCommentdata) {
-            res.status(404).json({ message: 'No comment found with thisid!' });
+        if(!dbCommentData) {
+            res.status(404).json({ message: 'No comment found with this id!' });
             return;
         }
         res.json(dbCommentData);
